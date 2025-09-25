@@ -24,8 +24,8 @@ import yaml
 
 
 def get_rebrickable_key():
-    config = yaml.safe_load(open("./config.yaml"))
     try:
+        config = yaml.safe_load(open("./config.yaml"))
         return config["rebrickable-key"]
-    except KeyError:
+    except (KeyError, FileNotFoundError):
         return None
