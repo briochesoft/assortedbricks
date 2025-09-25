@@ -207,7 +207,10 @@ class WebPage:
             key = get_rebrickable_key() is not None
             if request.method == 'POST':
                 file = request.files['part-list']
-                set = request.form['set-number']
+                try:
+                    set = request.form['set-number']
+                except KeyError:
+                    set = None
                 WebPage.num_clusters = int(request.form['num-clusters'])
                 try:
                     WebPage.seed = int(request.form['seed'])
