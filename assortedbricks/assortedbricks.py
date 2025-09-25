@@ -250,7 +250,7 @@ class WebPage:
         :return: None
         """
         if 'liveconsole' not in gethostname():
-            self.app.run(debug=False)
+            self.app.run(host="0.0.0.0", debug=False)
 
 
 def main():
