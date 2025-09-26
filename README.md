@@ -38,8 +38,6 @@ Supported file formats are:
  - Brickstore XML
  - LDCad PBG
 
-If you want to print the output, select the items you want to print, then right click -> print.
-
 ## Acknowledgement
 
 Special thanks to [brickarchitect](https://brickarchitect.com/) for the excellent data.

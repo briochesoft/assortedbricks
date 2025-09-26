@@ -60,7 +60,12 @@ class WebPage:
             }
             #result {
                 padding: 20px;
-                margin-top: 70px;
+                margin-top: 80px;
+                width: calc((100vw - 40px)/0.4);
+                height: calc((100vh - 100px)/0.4);
+                overflow-y: auto;
+                transform: scale(0.4);
+                transform-origin: top left;
             }
             .waiting {
                 animation: waiting 1s ease-in-out infinite;
@@ -77,13 +82,9 @@ class WebPage:
                 #header, h2 {
                     display: none;
                 }
-                #result {
+                #result{
                     display: block;
-                    height: auto;
-                    margin-top: 0;
-                }
-                #printable{
-                    display: block;
+                    width: auto;
                     height: auto;
                     overflow: visible;
                     transform: scale(1);
@@ -145,26 +146,18 @@ class WebPage:
                         onclick="document.querySelector('#header button').classList.add('waiting');"
                     >Generate Clusters</button></div>
                 </div>
-                <div class="container">
-                </div>
             </form>
         </div>
-        <div id="result" style="height: 100vh;">
-            {% if result %}
-                <h2>{{ num_clusters }} clusters</h2>
-                <iframe id="printable"
-                    srcdoc="{{ result }}"
-                    style="width: 250%;
-                        height: calc((100vh - 190px) * 2.5);
-                        border: 0;
-                        margin: 0;
-                        transform: scale(0.4);
-                        transform-origin: top left;
-                        overflow: scroll;"
+        {% if result %}
+            <div id="result"
                     onload="document.querySelector('#header button').classList.remove('waiting');">
-                </iframe>
-            {% endif %}
-        </div>
+                    <h2>{{ num_clusters }} clusters</h2>
+                    {% autoescape false %}
+                        {{ result }}
+                    {% endautoescape %}
+                </div>
+            </div>
+        {% endif %}
     </body>
     </html>
     """

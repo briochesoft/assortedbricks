@@ -126,14 +126,7 @@ class Inventory():
 
         # Open the output HTML file
         no_category = re.compile(r'^\d+\. ')
-        html_string = '<html>\n'
-        html_string += '<head>\n'
-        html_string += '<style>'
-        html_string += 'div {page-break-inside: avoid;}'
-        html_string += '</style>'
-        html_string += '<title>Clusters</title>\n'
-        html_string += '</head>\n'
-        html_string += '<body>\n'
+        html_string = ''
 
         self.db = Database()
         # Loop through each cluster
@@ -142,10 +135,6 @@ class Inventory():
                                        self.__single_cluster_html(cluster, no_category), clusters):
                 html_string += ''.join(result)
         self.db.close()
-
-        # Write the HTML footer
-        html_string += '</body>\n'
-        html_string += '</html>\n'
 
         print(f"{str(datetime.now())}: done")
         return html_string
