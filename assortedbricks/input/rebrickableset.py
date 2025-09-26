@@ -20,6 +20,7 @@
 #
 # SPDX-License-Identifier: MIT
 
+import os
 import json
 import requests
 from .inputinterface import InputInterface
@@ -66,6 +67,9 @@ class RebrickableSet(InputInterface):
         except requests.exceptions.HTTPError:
             raise ValueError('HTTP Error')
 
+        # Create directroy if it doesn't exist
+        if not os.path.exists(os.path.dirname(file)):
+            os.makedirs(os.path.dirname(file))
         with open(file, 'w') as f:
             json.dump(data, f)
 
