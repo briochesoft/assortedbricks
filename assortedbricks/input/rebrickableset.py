@@ -53,17 +53,22 @@ class RebrickableSet(InputInterface):
         if '-' not in str(input):
             input = f"{input}-1"
 
-        data = ""
+        set_data = []
         try:
             headers = {
                 'Authorization': f'key {key}',
                 'Content-Type': 'application/json'
             }
             url = f"https://rebrickable.com/api/v3/lego/sets/{input}/parts/"
-            response = requests.get(url, headers=headers)
-            if response.status_code != 200:
-                raise ValueError('Not a valid set number')
-            data = json.loads(response.content.decode('utf-8'))
+            while url is not None:
+                response = requests.get(url, headers=headers)
+                if response.status_code != 200:
+                    raise ValueError('Not a valid set number')
+                data = json.loads(response.content.decode('utf-8'))
+                set_data += data['results']
+                
+                # We need to get the data from the next page
+                url = data['next']
         except requests.exceptions.HTTPError:
             raise ValueError('HTTP Error')
 
@@ -71,7 +76,7 @@ class RebrickableSet(InputInterface):
         if not os.path.exists(os.path.dirname(file)):
             os.makedirs(os.path.dirname(file))
         with open(file, 'w') as f:
-            json.dump(data, f)
+            json.dump(set_data, f)
 
         # We raise ValueError so RebrickableJSON can load the file afterwards
         raise ValueError('File loaded, use RebrickableJSON')

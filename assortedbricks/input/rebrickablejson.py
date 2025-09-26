@@ -26,7 +26,7 @@ from .inputinterface import InputInterface
 
 
 class RebrickableJSON(InputInterface):
-    magic = '{"count":'
+    magic = '[{"id":'
 
     def load(self, _, file_path):
         """
@@ -52,7 +52,7 @@ class RebrickableJSON(InputInterface):
             # Read the JSON file
             data = json.load(f)
 
-        self.df = json_normalize(data, 'results')
+        self.df = json_normalize(data)
 
     def clean(self):
         """
