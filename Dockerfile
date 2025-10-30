@@ -1,6 +1,8 @@
 FROM python:3-slim
 
-WORKDIR /usr/src/assortedbricks
+RUN adduser abricks
+
+WORKDIR /home/abricks
 
 COPY . .
 
@@ -9,6 +11,9 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     && pip install --no-cache-dir -r requirements.txt \
     && apt-get --purge -y autoremove build-essential \
     && rm -rf /var/lib/apt/lists/*
+
+
+USER abricks
 
 CMD [ "./run-assortedbricks" ]
 
