@@ -15,6 +15,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 
 USER abricks
 
+HEALTHCHECK CMD bash -c "exec 6<> /dev/tcp/localhost/5000"
+
 CMD [ "./run-assortedbricks" ]
 
 EXPOSE 5000
