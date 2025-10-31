@@ -22,12 +22,27 @@
 
 import os
 from datetime import datetime
-import sqlite3
 from pandas import read_sql_query
+from sqlalchemy import create_engine
+from sqlalchemy import MetaData
+from sqlalchemy import Table, Column, Integer, String
+from sqlalchemy import select, update
+
+DATABASE_PATH = "./datastore/brickarchitect.sqlite"
+engine = create_engine(f"sqlite+pysqlite:///{DATABASE_PATH}")
+metadata_obj = MetaData()
+parts = Table(
+    "parts",
+    metadata_obj,
+    Column("index", Integer, primary_key=True),
+    Column("DesignID", Integer, unique=True, nullable=False),
+    Column("Labels", String, nullable=False),
+    Column("Image", String, nullable=True),
+    Column("Updated", String, nullable=False),
+)
 
 
 class Database:
-    database_path = "./datastore/brickarchitect.sqlite"
 
     def __init__(self):
         """
@@ -44,16 +59,9 @@ class Database:
         :return: None
         """
         # create the directory if it doesn't exist
-        if not os.path.exists(os.path.dirname(Database.database_path)):
-            os.makedirs(os.path.dirname(Database.database_path))
-        self.connection = sqlite3.connect(Database.database_path, check_same_thread=False)
-        cursor = self.connection.cursor()
-        # Create table if it doesn't exist
-        cursor.execute('CREATE TABLE IF NOT EXISTS "parts" ('
-                       '"index" INTEGER PRIMARY KEY, '
-                       '"DesignID" INTEGER UNIQUE, '
-                       '"Labels" TEXT NOT NULL, '
-                       '"Image" TEXT, "Updated" TEXT NOT NULL)')
+        if not os.path.exists(os.path.dirname(DATABASE_PATH)):
+            os.makedirs(os.path.dirname(DATABASE_PATH))
+        metadata_obj.create_all(engine)
 
     def __del__(self):
         """
@@ -62,14 +70,15 @@ class Database:
         This should be called when the database is no longer needed to prevent
         memory leaks.
         """
-        self.connection.commit()
-        self.connection.close()
+        with engine.connect() as conn:
+            conn.commit()
 
     def commit(self):
         """
         Commits all pending transactions.
         """
-        self.connection.commit()
+        with engine.connect() as conn:
+            conn.commit()
 
     def fetch_part_image(self, design_id):
         """
@@ -85,8 +94,8 @@ class Database:
         str
             The base64 encoded image data.
         """
-        cursor = self.connection.cursor()
-        return cursor.execute(f"SELECT Image FROM parts WHERE DesignID={design_id}").fetchone()[0]
+        with engine.connect() as conn:
+            return conn.execute(select(parts.c.Image).filter(parts.c.DesignID == design_id)).first()
 
     def get_labels_dataframe(self, design_ids):
         """
@@ -103,8 +112,9 @@ class Database:
         pandas.DataFrame
             A DataFrame containing the design IDs and their corresponding labels.
         """
-        return read_sql_query("SELECT DesignID, Labels FROM parts "
-                              f"WHERE DesignID IN ({design_ids})", self.connection)
+        stmt = select(parts.c.DesignID, parts.c.Labels).filter(parts.c.DesignID.in_(design_ids.split(',')))
+        with engine.connect() as conn:
+            return read_sql_query(stmt, conn)
 
     def append_parts_dataframe(self, parts_df):
         """
@@ -119,8 +129,8 @@ class Database:
         -------
         None
         """
-        parts_df.to_sql("parts", self.connection, if_exists="append", index=False)
-        self.connection.commit()
+        with engine.begin() as conn:
+            parts_df.to_sql("parts", conn, if_exists="append", index=False)
 
     def get_missing_images(self, design_ids):
         """
@@ -138,9 +148,9 @@ class Database:
             for each part that is missing an image.
         """
 
-        cursor = self.connection.cursor()
-        return cursor.execute("SELECT DesignID, Updated FROM parts WHERE "
-                              f"DesignID IN ({design_ids}) AND Image IS NULL").fetchall()
+        with engine.connect() as conn:
+            return conn.execute(select(parts.c.DesignID, parts.c.Updated)
+                    .filter(parts.c.DesignID.in_(design_ids.split(',')), parts.c.Image.is_(None))).all()
 
     def update_image(self, design_id, image):
         """
@@ -158,9 +168,8 @@ class Database:
         None
         """
         today = datetime.now().strftime('%Y-%m-%d')
-        cursor = self.connection.cursor()
-        cursor.execute(f'UPDATE parts SET Image="{image}", Updated="{today}" '
-                       f'WHERE DesignID={design_id}')
+        with engine.connect() as conn:
+            conn.execute(update(parts).where(parts.c.DesignID == design_id).values(Image=image, Updated=today))
 
     def get_images_for_cluster(self, cluster):
         """
@@ -177,7 +186,6 @@ class Database:
         list
             A list of tuples containing the image data for each part in the cluster.
         """
-        cursor = self.connection.cursor()
-        return cursor.execute("SELECT Image FROM parts WHERE "
-                              f"DesignID IN ({cluster['DesignIDs']}) "
-                              "ORDER BY DesignID ASC").fetchall()
+        with engine.connect() as conn:
+            return conn.execute(select(parts.c.Image).filter(parts.c.DesignID.in_(cluster['DesignIDs'].split(", ")))
+                    .order_by(parts.c.DesignID)).fetchall()
