@@ -10,7 +10,7 @@ I found [brickarchitect](https://brickarchitect.com/), and it provided the perfe
 
 ## Installation
 
-```
+```bash
 python3 -m venv .env
 source .env/bin/activate
 pip install -r requirements.txt
@@ -18,7 +18,7 @@ pip install -r requirements.txt
 
 ## Usage
 
-```
+```bash
 source .env/bin/activate
 ./run-assortedbrick
 ```
@@ -29,9 +29,9 @@ Give a set number or choose an inventory file, the number of clusters to generat
 
 The set number input is only available is a Rebrickable API key has been configured in the ``config.yaml`` file:
 
-``
+```yaml
 rebrickable-key: "KEY"
-``
+```
 
 Supported file formats are:
  - Rebrickable CSV
