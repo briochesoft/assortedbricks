@@ -62,7 +62,7 @@ class RebrickableSet(InputInterface):
             }
             url = f"https://rebrickable.com/api/v3/lego/sets/{input}/parts/"
             while url is not None:
-                response = requests.get(url, headers=headers)
+                response = requests.get(url, headers=headers, timeout=10)
                 if response.status_code != 200:
                     raise ValueError('Not a valid set number')
                 data = json.loads(response.content.decode('utf-8'))
@@ -72,6 +72,8 @@ class RebrickableSet(InputInterface):
                 url = data['next']
         except requests.exceptions.HTTPError:
             raise ValueError('HTTP Error')
+        except requests.exceptions.Timeout:
+            raise ValueError('HTTP timeout')
 
         # Create directroy if it doesn't exist
         if not os.path.exists(os.path.dirname(file_path)):

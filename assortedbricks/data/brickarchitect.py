@@ -45,7 +45,7 @@ def get_labels(partid):
     labels = 'Lego'
     try:
         url = f"https://brickarchitect.com/parts/{partid}"
-        response = requests.get(url)
+        response = requests.get(url, timeout=10)
         soup = BeautifulSoup(response.content, 'html.parser')
         labels_div = soup.find('div', class_='chapternav')
         labels_a = [a.text for a in labels_div.find_all('a')]
@@ -56,6 +56,8 @@ def get_labels(partid):
             new_part = response.url.split('/')[-1]
     except requests.exceptions.HTTPError:
         print(f"Failed to fetch labels for part ID {partid}")
+    except requests.exceptions.Timeout:
+        print(f"Timeout fetching labels for part ID {partid}")
     except AttributeError as e:
         print(e)
         print(f"Failed to read labels for part ID {partid}")
@@ -80,11 +82,13 @@ def get_image(partid):
     try:
         # Fetch the part image from the provided URL
         url = f"https://brickarchitect.com/content/parts/{partid}.png"
-        response = requests.get(url)
+        response = requests.get(url, timeout=10)
         response.raise_for_status()
         image = b64encode(response.content).decode('utf-8')
     except requests.exceptions.HTTPError:
         print(f"Failed to fetch part image for part ID {partid}")
+    except requests.exceptions.Timeout:
+        print(f"Timeout fetching part image for part ID {partid}")
 
     # Get the image data
     return image
