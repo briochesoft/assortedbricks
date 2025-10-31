@@ -20,7 +20,7 @@ pip install -r requirements.txt
 
 ```bash
 source .env/bin/activate
-./run-assortedbrick
+./run-assortedbricks
 ```
 
 Then connect to ```http://localhost:5000``` 
