@@ -40,7 +40,7 @@ class InputInterface(abc.ABC):
 
     def extension(self):
         """Get the format file extension"""
-        return ""
+        return str("")
 
     def dataframe(self):
         """Getter for the df attribute."""
