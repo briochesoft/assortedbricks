@@ -55,7 +55,7 @@ class Database:
                        '"Labels" TEXT NOT NULL, '
                        '"Image" TEXT, "Updated" TEXT NOT NULL)')
 
-    def close(self):
+    def __del__(self):
         """
         Commits all pending transactions and closes the database connection.
 
@@ -64,6 +64,12 @@ class Database:
         """
         self.connection.commit()
         self.connection.close()
+
+    def commit(self):
+        """
+        Commits all pending transactions.
+        """
+        self.connection.commit()
 
     def fetch_part_image(self, design_id):
         """

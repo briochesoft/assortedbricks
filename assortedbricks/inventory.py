@@ -41,7 +41,7 @@ class Inventory():
         None
         """
         self.df = None
-        self.db = None
+        self.db = Database()
         self.clusters = None
         self.input = Input()
 
@@ -66,8 +66,7 @@ class Inventory():
         print(f"{str(datetime.now())}: Cleaning inventory...")
         self.input.clean()
 
-        # Open the local database
-        self.db = Database()
+        # Start from a clean dataframe
         self.df = None
 
         # Use the database to get already existing parts
@@ -82,8 +81,8 @@ class Inventory():
         print(f"{str(datetime.now())}: Updating missing images...")
         self.update_images()
 
-        # No need for the database anymore
-        self.db.close()
+        # Commit database changes
+        self.db.commit()
 
         # Prepare data for clustering using the labels hirarchy
         print(f"{str(datetime.now())}: Creating labels hirarchy...")
@@ -128,13 +127,12 @@ class Inventory():
         no_category = re.compile(r'^\d+\. ')
         html_string = ''
 
-        self.db = Database()
         # Loop through each cluster
         with ThreadPoolExecutor() as executor:
             for result in executor.map(lambda cluster:
                                        self.__single_cluster_html(cluster, no_category), clusters):
                 html_string += ''.join(result)
-        self.db.close()
+        self.db.commit()
 
         print(f"{str(datetime.now())}: done")
         return html_string
