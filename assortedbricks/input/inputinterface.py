@@ -34,7 +34,7 @@ class InputInterface(abc.ABC):
         raise NotImplementedError
 
     @abc.abstractmethod
-    def load(self, input, file_path):
+    def load(self, input_data, file_path):
         """Load data into the dataframe"""
         raise NotImplementedError
 

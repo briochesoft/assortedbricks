@@ -28,19 +28,24 @@ from .inputinterface import InputInterface
 class RebrickableJSON(InputInterface):
     magic = '[{"id":'
 
-    def load(self, _, file_path):
+    def load(self, input_data, file_path):
         """
         This function loads a Rebrickable JSON from a from the given file_path.
 
         Parameters
         ----------
-        input : str
-            The set number to load.
+        input_data : str
+            Not used.
+        file_path : str
+            The path to the JSON file to be read.
 
         Returns
         -------
         None
         """
+        # input_data is explicitly not used
+        del input_data
+
         # Check if the file is a Rebrickable JSON file
         with open(file_path, 'r', encoding='utf-8') as f:
             first_line = f.read(len(RebrickableJSON.magic))

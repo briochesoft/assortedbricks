@@ -27,12 +27,14 @@ from .inputinterface import InputInterface
 class BrickStoreXML(InputInterface):
     magic = "<BrickStoreXML>"
 
-    def load(self, _, file_path):
+    def load(self, input_data, file_path):
         """
         This function loads a BrickStore XML file from the given file_path.
 
         Parameters
         ----------
+        input_data : str
+            Not used.
         file_path : str
             The path to the XML file to be read.
 
@@ -40,6 +42,9 @@ class BrickStoreXML(InputInterface):
         -------
         None
         """
+        # input_data is explicitly not used
+        del input_data
+
         # Check if the file is a BrickStore XML file
         with open(file_path, 'r', encoding='utf-8') as f:
             first_line = f.read(len(BrickStoreXML.magic))

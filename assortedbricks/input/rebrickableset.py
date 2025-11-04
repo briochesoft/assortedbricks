@@ -30,13 +30,13 @@ from ..data.config import get_rebrickable_key
 class RebrickableSet(InputInterface):
     magic = '{'
 
-    def load(self, input, file_path):
+    def load(self, input_data, file_path):
         """
         This function loads a Rebrickable JSON from a set number.
 
         Parameters
         ----------
-        input : str
+        input_data : str
             The set number to load.
         file_path : str
             The file path to store the retrieved data
@@ -49,11 +49,11 @@ class RebrickableSet(InputInterface):
         if key is None:
             raise ValueError('No Rebrickable key not found')
 
-        if input is None or len(input) < 4:
+        if input_data is None or len(input_data) < 4:
             raise ValueError('Not a valid set number')
 
-        if '-' not in str(input):
-            input = f"{input}-1"
+        if '-' not in str(input_data):
+            input_data = f"{input_data}-1"
 
         set_data = []
         try:
