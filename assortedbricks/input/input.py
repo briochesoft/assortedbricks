@@ -42,7 +42,7 @@ class Input(InputInterface):
         """
         self.input.clean()
 
-    def load(self, input, file_path):
+    def load(self, input_data, file_path):
         """
         Loads an input (set number of file path) into the Input object.
 
@@ -51,20 +51,20 @@ class Input(InputInterface):
 
         Parameters
         ----------
-        input : str
-            Input to be loaded.
+        input_data : str
+            Data to be loaded.
         file_path : str
             File path for the data.
 
         Returns
         -------
         bool
-            True if the input was successfully loaded, False otherwise.
+            True if the data was successfully loaded, False otherwise.
         """
         supported = False
         for supported_format in self.supported_formats:
             try:
-                supported_format.load(input, file_path)
+                supported_format.load(input_data, file_path)
                 self.input = supported_format
                 supported = True
                 break

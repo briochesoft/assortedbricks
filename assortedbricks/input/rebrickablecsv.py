@@ -27,12 +27,14 @@ from .inputinterface import InputInterface
 class RebrickableCSV(InputInterface):
     magic = "Part,Color,Quantity"
 
-    def load(self, _, file_path):
+    def load(self, input_data, file_path):
         """
         This function loads a Rebrickable file from the given file_path.
 
         Parameters
         ----------
+        input_data : str
+            Not used.
         file_path : str
             The path to the CSV file to be read.
 
@@ -40,6 +42,9 @@ class RebrickableCSV(InputInterface):
         -------
         None
         """
+        # input_data is explicitly not used
+        del input_data
+
         # Check if the file is a Rebrickable CSV file
         with open(file_path, 'r', encoding='utf-8') as f:
             first_line = f.read(len(RebrickableCSV.magic))
