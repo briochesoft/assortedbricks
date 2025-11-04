@@ -40,7 +40,7 @@ class Inventory():
         -------
         None
         """
-        self.df = None
+        self.df = DataFrame()
         self.db = Database()
         self.clusters = None
         self.input = Input()
@@ -67,7 +67,7 @@ class Inventory():
         self.input.clean()
 
         # Start from a clean dataframe
-        self.df = None
+        self.df = DataFrame()
 
         # Use the database to get already existing parts
         print(f"{str(datetime.now())}: Merging with local database...")
