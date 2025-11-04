@@ -30,7 +30,7 @@ from ..data.config import get_rebrickable_key
 class RebrickableSet(InputInterface):
     magic = '{'
 
-    def load(self, input, file):
+    def load(self, input, file_path):
         """
         This function loads a Rebrickable JSON from a set number.
 
@@ -38,6 +38,8 @@ class RebrickableSet(InputInterface):
         ----------
         input : str
             The set number to load.
+        file_path : str
+            The file path to store the retrieved data
 
         Returns
         -------
@@ -73,9 +75,9 @@ class RebrickableSet(InputInterface):
             raise ValueError('HTTP Error')
 
         # Create directroy if it doesn't exist
-        if not os.path.exists(os.path.dirname(file)):
-            os.makedirs(os.path.dirname(file))
-        with open(file, 'w') as f:
+        if not os.path.exists(os.path.dirname(file_path)):
+            os.makedirs(os.path.dirname(file_path))
+        with open(file_path, 'w') as f:
             json.dump(set_data, f)
 
         # We raise ValueError so RebrickableJSON can load the file afterwards
