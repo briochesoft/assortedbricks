@@ -228,7 +228,7 @@ class WebPage:
                                                   key=key)
                 except ValueError as e:
                     print(e)
-                    pass
+
             return render_template_string(WebPage.template,
                                           result=None,
                                           num_clusters=WebPage.num_clusters,
