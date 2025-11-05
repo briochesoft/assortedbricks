@@ -286,8 +286,7 @@ class Inventory():
         labels_len = 0
         all_labels = []
         for subarray in labels_array:
-            if labels_len < len(subarray):
-                labels_len = len(subarray)
+            labels_len = max(labels_len, len(subarray))
         for i in range(labels_len):
             for subarray in labels_array:
                 if i < len(subarray):
