@@ -78,7 +78,7 @@ class RebrickableSet(InputInterface):
         # Create directroy if it doesn't exist
         if not os.path.exists(os.path.dirname(file_path)):
             os.makedirs(os.path.dirname(file_path))
-        with open(file_path, 'w') as f:
+        with open(file_path, 'w', encoding='utf-8') as f:
             json.dump(set_data, f)
 
         # We raise RuntimeError so RebrickableJSON can load the file afterwards
