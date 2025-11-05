@@ -21,9 +21,9 @@
 # SPDX-License-Identifier: MIT
 
 import os
+from socket import gethostname
 from flask import Flask, request, render_template_string
 from numpy.random import default_rng
-from socket import gethostname
 from .inventory import Inventory
 from .data.config import get_rebrickable_key
 
