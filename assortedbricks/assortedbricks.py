@@ -201,9 +201,9 @@ class WebPage:
             if request.method == 'POST':
                 file = request.files['part-list']
                 try:
-                    set = request.form['set-number']
+                    set_number = request.form['set-number']
                 except KeyError:
-                    set = None
+                    set_number = None
                 WebPage.num_clusters = int(request.form['num-clusters'])
                 try:
                     WebPage.seed = int(request.form['seed'])
@@ -217,7 +217,7 @@ class WebPage:
                         os.makedirs(os.path.dirname(WebPage.file_path))
                     file.save(WebPage.file_path)
                 try:
-                    inventory.load(set, WebPage.file_path)
+                    inventory.load(set_number, WebPage.file_path)
                     inventory.cluster(WebPage.num_clusters, seed=WebPage.seed)
                     result = inventory.as_html()
                     return render_template_string(WebPage.template,
