@@ -67,13 +67,13 @@ class RebrickableSet(InputInterface):
                     raise ValueError('Not a valid set number')
                 data = json.loads(response.content.decode('utf-8'))
                 set_data += data['results']
-                
+
                 # We need to get the data from the next page
                 url = data['next']
-        except requests.exceptions.HTTPError:
-            raise ValueError('HTTP Error')
-        except requests.exceptions.Timeout:
-            raise ValueError('HTTP timeout')
+        except requests.exceptions.HTTPError as exc:
+            raise ValueError('HTTP Error') from exc
+        except requests.exceptions.Timeout as exc:
+            raise ValueError('HTTP timeout') from exc
 
         # Create directroy if it doesn't exist
         if not os.path.exists(os.path.dirname(file_path)):
