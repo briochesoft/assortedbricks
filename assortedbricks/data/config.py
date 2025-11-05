@@ -24,8 +24,14 @@ import yaml
 
 
 def get_rebrickable_key():
+    """
+    Retrieve the Rebrickable API key from the configuration file.
+
+    :return: The key as a string if successful otherwise None
+    """
     try:
-        config = yaml.safe_load(open("./config.yaml"))
+        with open("./config.yaml", 'r', encoding='utf-8') as f:
+            config = yaml.safe_load(f)
         return config["rebrickable-key"]
     except (KeyError, FileNotFoundError):
         return None
