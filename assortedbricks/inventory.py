@@ -45,21 +45,24 @@ class Inventory():
         self.clusters = None
         self.input = Input()
 
-    def load(self, input, file):
+    def load(self, input_data, file_path):
         """
         Load a file ready to be clustered.
 
         Parameters
         ----------
-        input_file : str
-            The path to the input file containing the inventory list.
+        input_data : str
+            The optional data to get the input from.
+
+        file_path : str
+            The path to the file containing the inventory list.
 
         Returns
         -------
         None
         """
         # Try to load the input file through all supported formats
-        if not self.input.load(input, file):
+        if not self.input.load(input_data, file_path):
             raise ValueError("Failed to load input file")
 
         # Transform the input file to a standard format

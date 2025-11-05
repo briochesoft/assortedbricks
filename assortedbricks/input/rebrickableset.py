@@ -60,7 +60,7 @@ class RebrickableSet(InputInterface):
                 'Authorization': f'key {key}',
                 'Content-Type': 'application/json'
             }
-            url = f"https://rebrickable.com/api/v3/lego/sets/{input}/parts/"
+            url = f"https://rebrickable.com/api/v3/lego/sets/{input_data}/parts/"
             while url is not None:
                 response = requests.get(url, headers=headers, timeout=10)
                 if response.status_code != 200:
