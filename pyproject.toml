@@ -1,0 +1,19 @@
+[tool.bandit]
+skips = ["B104", "B101"]
+
+[tool.black]
+line-length = 120
+
+[tool.pylint.MAIN]
+max-line-length = 120
+
+[tool.pylint."MESSAGES CONTROL"]
+disable = [
+    "import-error",
+    "missing-module-docstring",
+    "missing-class-docstring",
+    "duplicate-code",
+]
+
+[tool.pyright]
+reportMissingImports = false
