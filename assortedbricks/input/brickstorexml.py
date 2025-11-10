@@ -72,7 +72,7 @@ class BrickStoreXML(InputInterface):
         # Rename Part to DesignID and Qty to Quantity
         self.df = self.df.rename(columns={'ItemID': 'DesignID', 'Qty': 'Quantity'})
         # Only keep the first digits from the DesignID
-        self.df['DesignID'] = self.df['DesignID'].str.extract(r'^(\d+)')[0]
+        self.df.loc[:, 'DesignID'] = self.df['DesignID'].str.extract(r'^(\d+)')[0]
 
         # Group by "DesignID" and sum the "Quantity"
         self.df = self.df.groupby('DesignID')['Quantity'].sum().reset_index()

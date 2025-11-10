@@ -93,7 +93,7 @@ class LDCadPBG(InputInterface):
         self.df.Quantity = self.df.Quantity.astype(int)
 
         # Only keep the first digits from the DesignID
-        self.df['DesignID'] = self.df['DesignID'].str.extract(r'^(\d+)')[0]
+        self.df.loc[:, 'DesignID'] = self.df['DesignID'].str.extract(r'^(\d+)')[0]
 
         # Group by "DesignID" and sum the "Quantity"
         self.df = self.df.groupby('DesignID')['Quantity'].sum().reset_index()
