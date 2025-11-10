@@ -68,7 +68,7 @@ class Input(InputInterface):
                 self.input = supported_format
                 supported = True
                 break
-            except ValueError:
+            except RuntimeError:
                 pass
         return supported
 

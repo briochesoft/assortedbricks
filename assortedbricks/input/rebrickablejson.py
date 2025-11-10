@@ -50,7 +50,7 @@ class RebrickableJSON(InputInterface):
         with open(file_path, 'r', encoding='utf-8') as f:
             first_line = f.read(len(RebrickableJSON.magic))
             if not first_line.startswith(RebrickableJSON.magic):
-                raise ValueError('Invalid Rebrickable JSON file, '
+                raise RuntimeError('Invalid Rebrickable JSON file, '
                                  f'first line should be "{RebrickableJSON.magic}"')
 
         with open(file_path, 'r', encoding='utf-8') as f:

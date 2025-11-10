@@ -28,7 +28,6 @@ from ..data.config import get_rebrickable_key
 
 
 class RebrickableSet(InputInterface):
-    magic = '{'
 
     def load(self, input_data, file_path):
         """
@@ -47,10 +46,10 @@ class RebrickableSet(InputInterface):
         """
         key = get_rebrickable_key()
         if key is None:
-            raise ValueError('No Rebrickable key not found')
+            raise RuntimeError('No Rebrickable key not found')
 
         if input_data is None or len(input_data) < 4:
-            raise ValueError('Not a valid set number')
+            raise RuntimeError('Not a valid set number')
 
         if '-' not in str(input_data):
             input_data = f"{input_data}-1"
@@ -80,5 +79,5 @@ class RebrickableSet(InputInterface):
         with open(file_path, 'w') as f:
             json.dump(set_data, f)
 
-        # We raise ValueError so RebrickableJSON can load the file afterwards
-        raise ValueError('File loaded, use RebrickableJSON')
+        # We raise RuntimeError so RebrickableJSON can load the file afterwards
+        raise RuntimeError('File loaded, use RebrickableJSON')

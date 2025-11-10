@@ -49,7 +49,7 @@ class RebrickableCSV(InputInterface):
         with open(file_path, 'r', encoding='utf-8') as f:
             first_line = f.read(len(RebrickableCSV.magic))
             if not first_line.startswith(RebrickableCSV.magic):
-                raise ValueError('Invalid Rebrickable CSV file, '
+                raise RuntimeError('Invalid Rebrickable CSV file, '
                                  f'first line should be "{RebrickableCSV.magic}"')
 
         # Read the CSV file

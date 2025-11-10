@@ -50,7 +50,7 @@ class LDCadPBG(InputInterface):
         with open(file_path, 'r', encoding='utf-8') as f:
             first_line = f.read(len(LDCadPBG.magic))
             if not first_line.startswith(LDCadPBG.magic):
-                raise ValueError('Invalid LDCad file, '
+                raise RuntimeError('Invalid LDCad file, '
                                  f'first line should be "{LDCadPBG.magic}"')
 
         # Read the CSV file
