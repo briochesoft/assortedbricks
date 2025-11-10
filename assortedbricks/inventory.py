@@ -300,7 +300,7 @@ class Inventory():
         # Set the value of each label column to 1 if the label is present in the database
         for label in all_labels:
             if label:
-                label_df[label] = where(label_df['Labels'].str.contains(label), 1, 0)
+                label_df.loc[:, label] = where(label_df.loc[:, 'Labels'].str.contains(label, regex=False), 1, 0)
 
         # Drop the unnecessary Labels column from the output dataframe
         self.df = label_df.drop('Labels', axis=1)
