@@ -49,7 +49,7 @@ class BrickStoreXML(InputInterface):
         with open(file_path, 'r', encoding='utf-8') as f:
             first_line = f.read(len(BrickStoreXML.magic))
             if not first_line.startswith(BrickStoreXML.magic):
-                raise ValueError('Invalid BrickStore XML file, '
+                raise RuntimeError('Invalid BrickStore XML file, '
                                  f'first line should be "{BrickStoreXML.magic}"')
 
         # Read the CSV file
