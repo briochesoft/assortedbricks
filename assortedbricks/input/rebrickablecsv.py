@@ -21,6 +21,7 @@
 # SPDX-License-Identifier: MIT
 
 from pandas import read_csv
+
 from .inputinterface import InputInterface
 
 
@@ -46,11 +47,10 @@ class RebrickableCSV(InputInterface):
         del input_data
 
         # Check if the file is a Rebrickable CSV file
-        with open(file_path, 'r', encoding='utf-8') as f:
+        with open(file_path, "r", encoding="utf-8") as f:
             first_line = f.read(len(RebrickableCSV.magic))
             if not first_line.startswith(RebrickableCSV.magic):
-                raise RuntimeError('Invalid Rebrickable CSV file, '
-                                 f'first line should be "{RebrickableCSV.magic}"')
+                raise RuntimeError("Invalid Rebrickable CSV file, " f'first line should be "{RebrickableCSV.magic}"')
 
         # Read the CSV file
         self.df = read_csv(file_path)
@@ -68,19 +68,19 @@ class RebrickableCSV(InputInterface):
         None
         """
         # Select only the "Part" and "Quantity" columns
-        self.df = self.df[['Part', 'Quantity']]
+        self.df = self.df[["Part", "Quantity"]]
         # Rename Part to DesignID
-        self.df = self.df.rename(columns={'Part': 'DesignID'})
+        self.df = self.df.rename(columns={"Part": "DesignID"})
         # Only keep the first digits from the DesignID
-        self.df.loc[:, 'DesignID'] = self.df['DesignID'].str.extract(r'^(\d+)')[0]
+        self.df.loc[:, "DesignID"] = self.df["DesignID"].str.extract(r"^(\d+)")[0]
 
         # Group by "DesignID" and sum the "Quantity"
-        self.df = self.df.groupby('DesignID')['Quantity'].sum().reset_index()
+        self.df = self.df.groupby("DesignID")["Quantity"].sum().reset_index()
 
         # Sort the dataframe by "DesignID" in ascending numerical order
         self.df.DesignID = self.df.DesignID.astype(int)
         self.df.Quantity = self.df.Quantity.astype(int)
-        self.df = self.df.sort_values(by='DesignID', ascending=True)
+        self.df = self.df.sort_values(by="DesignID", ascending=True)
 
     def extension(self):
         """

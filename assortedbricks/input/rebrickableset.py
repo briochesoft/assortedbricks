@@ -20,11 +20,13 @@
 #
 # SPDX-License-Identifier: MIT
 
-import os
 import json
+import os
+
 import requests
-from .inputinterface import InputInterface
+
 from ..data.config import get_rebrickable_key
+from .inputinterface import InputInterface
 
 
 class RebrickableSet(InputInterface):
@@ -46,40 +48,37 @@ class RebrickableSet(InputInterface):
         """
         key = get_rebrickable_key()
         if key is None:
-            raise RuntimeError('No Rebrickable key not found')
+            raise RuntimeError("No Rebrickable key not found")
 
         if input_data is None or len(input_data) < 4:
-            raise RuntimeError('Not a valid set number')
+            raise RuntimeError("Not a valid set number")
 
-        if '-' not in str(input_data):
+        if "-" not in str(input_data):
             input_data = f"{input_data}-1"
 
         set_data = []
         try:
-            headers = {
-                'Authorization': f'key {key}',
-                'Content-Type': 'application/json'
-            }
+            headers = {"Authorization": f"key {key}", "Content-Type": "application/json"}
             url = f"https://rebrickable.com/api/v3/lego/sets/{input_data}/parts/"
             while url is not None:
                 response = requests.get(url, headers=headers, timeout=10)
                 if response.status_code != 200:
-                    raise ValueError('Not a valid set number')
-                data = json.loads(response.content.decode('utf-8'))
-                set_data += data['results']
+                    raise ValueError("Not a valid set number")
+                data = json.loads(response.content.decode("utf-8"))
+                set_data += data["results"]
 
                 # We need to get the data from the next page
-                url = data['next']
+                url = data["next"]
         except requests.exceptions.HTTPError as exc:
-            raise ValueError('HTTP Error') from exc
+            raise ValueError("HTTP Error") from exc
         except requests.exceptions.Timeout as exc:
-            raise ValueError('HTTP timeout') from exc
+            raise ValueError("HTTP timeout") from exc
 
         # Create directroy if it doesn't exist
         if not os.path.exists(os.path.dirname(file_path)):
             os.makedirs(os.path.dirname(file_path))
-        with open(file_path, 'w', encoding='utf-8') as f:
+        with open(file_path, "w", encoding="utf-8") as f:
             json.dump(set_data, f)
 
         # We raise RuntimeError so RebrickableJSON can load the file afterwards
-        raise RuntimeError('File loaded, use RebrickableJSON')
+        raise RuntimeError("File loaded, use RebrickableJSON")

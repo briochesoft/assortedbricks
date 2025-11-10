@@ -22,10 +22,12 @@
 
 import os
 from socket import gethostname
-from flask import Flask, request, render_template_string
+
+from flask import Flask, render_template_string, request
 from numpy.random import default_rng
-from .inventory import Inventory
+
 from .data.config import get_rebrickable_key
+from .inventory import Inventory
 
 
 class WebPage:
@@ -163,7 +165,7 @@ class WebPage:
     """
     num_clusters = 10
     seed = 0
-    file_path = './temp/uploaded_file'
+    file_path = "./temp/uploaded_file"
 
     def __init__(self, flask_app):
         self.app = flask_app
@@ -178,7 +180,8 @@ class WebPage:
 
         The main route is at '/' and accepts both GET and POST requests.
         """
-        @self.app.route('/', methods=['GET', 'POST'])
+
+        @self.app.route("/", methods=["GET", "POST"])
         def index():
             """
             Handles both GET and POST requests to the main route.
@@ -198,19 +201,19 @@ class WebPage:
             inventory = Inventory()
             extensions = inventory.get_extensions()
             key = get_rebrickable_key() is not None
-            if request.method == 'POST':
-                file = request.files['part-list']
+            if request.method == "POST":
+                file = request.files["part-list"]
                 try:
-                    set_number = request.form['set-number']
+                    set_number = request.form["set-number"]
                 except KeyError:
                     set_number = None
-                WebPage.num_clusters = int(request.form['num-clusters'])
+                WebPage.num_clusters = int(request.form["num-clusters"])
                 try:
-                    WebPage.seed = int(request.form['seed'])
+                    WebPage.seed = int(request.form["seed"])
                     print(f"seed {WebPage.seed}")
                 except ValueError:
                     rng = default_rng()
-                    WebPage.seed = rng.integers(low=0, high=2**32-1, size=1)[0]
+                    WebPage.seed = rng.integers(low=0, high=2**32 - 1, size=1)[0]
                 if file:
                     # create the directory if it doesn't exist
                     if not os.path.exists(os.path.dirname(WebPage.file_path)):
@@ -220,21 +223,25 @@ class WebPage:
                     inventory.load(set_number, WebPage.file_path)
                     inventory.cluster(WebPage.num_clusters, seed=WebPage.seed)
                     result = inventory.as_html()
-                    return render_template_string(WebPage.template,
-                                                  result=result,
-                                                  num_clusters=WebPage.num_clusters,
-                                                  seed=WebPage.seed,
-                                                  extensions=extensions,
-                                                  key=key)
+                    return render_template_string(
+                        WebPage.template,
+                        result=result,
+                        num_clusters=WebPage.num_clusters,
+                        seed=WebPage.seed,
+                        extensions=extensions,
+                        key=key,
+                    )
                 except ValueError as e:
                     print(e)
 
-            return render_template_string(WebPage.template,
-                                          result=None,
-                                          num_clusters=WebPage.num_clusters,
-                                          seed=WebPage.seed,
-                                          extensions=extensions,
-                                          key=key)
+            return render_template_string(
+                WebPage.template,
+                result=None,
+                num_clusters=WebPage.num_clusters,
+                seed=WebPage.seed,
+                extensions=extensions,
+                key=key,
+            )
 
     def run(self):
         """
@@ -242,7 +249,7 @@ class WebPage:
 
         :return: None
         """
-        if 'liveconsole' not in gethostname():
+        if "liveconsole" not in gethostname():
             self.app.run(host="0.0.0.0", debug=False)
 
 
@@ -257,5 +264,5 @@ def main():
     web_page.run()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

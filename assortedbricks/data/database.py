@@ -22,11 +22,18 @@
 
 import os
 from datetime import datetime
+
 from pandas import read_sql_query
-from sqlalchemy import create_engine
-from sqlalchemy import MetaData
-from sqlalchemy import Table, Column, Integer, String
-from sqlalchemy import select, update
+from sqlalchemy import (
+    Column,
+    Integer,
+    MetaData,
+    String,
+    Table,
+    create_engine,
+    select,
+    update,
+)
 
 DATABASE_PATH = "./datastore/brickarchitect.sqlite"
 engine = create_engine(f"sqlite+pysqlite:///{DATABASE_PATH}")
@@ -112,7 +119,7 @@ class Database:
         pandas.DataFrame
             A DataFrame containing the design IDs and their corresponding labels.
         """
-        stmt = select(parts.c.DesignID, parts.c.Labels).filter(parts.c.DesignID.in_(design_ids.split(',')))
+        stmt = select(parts.c.DesignID, parts.c.Labels).filter(parts.c.DesignID.in_(design_ids.split(",")))
         with engine.connect() as conn:
             return read_sql_query(stmt, conn)
 
@@ -149,8 +156,11 @@ class Database:
         """
 
         with engine.connect() as conn:
-            return conn.execute(select(parts.c.DesignID, parts.c.Updated)
-                    .filter(parts.c.DesignID.in_(design_ids.split(',')), parts.c.Image.is_(None))).all()
+            return conn.execute(
+                select(parts.c.DesignID, parts.c.Updated).filter(
+                    parts.c.DesignID.in_(design_ids.split(",")), parts.c.Image.is_(None)
+                )
+            ).all()
 
     def update_image(self, design_id, image):
         """
@@ -167,7 +177,7 @@ class Database:
         -------
         None
         """
-        today = datetime.now().strftime('%Y-%m-%d')
+        today = datetime.now().strftime("%Y-%m-%d")
         with engine.connect() as conn:
             conn.execute(update(parts).where(parts.c.DesignID == design_id).values(Image=image, Updated=today))
 
@@ -187,5 +197,8 @@ class Database:
             A list of tuples containing the image data for each part in the cluster.
         """
         with engine.connect() as conn:
-            return conn.execute(select(parts.c.Image).filter(parts.c.DesignID.in_(cluster['DesignIDs'].split(", ")))
-                    .order_by(parts.c.DesignID)).fetchall()
+            return conn.execute(
+                select(parts.c.Image)
+                .filter(parts.c.DesignID.in_(cluster["DesignIDs"].split(", ")))
+                .order_by(parts.c.DesignID)
+            ).fetchall()

@@ -21,7 +21,9 @@
 # SPDX-License-Identifier: MIT
 
 import json
+
 from pandas import json_normalize
+
 from .inputinterface import InputInterface
 
 
@@ -47,13 +49,12 @@ class RebrickableJSON(InputInterface):
         del input_data
 
         # Check if the file is a Rebrickable JSON file
-        with open(file_path, 'r', encoding='utf-8') as f:
+        with open(file_path, "r", encoding="utf-8") as f:
             first_line = f.read(len(RebrickableJSON.magic))
             if not first_line.startswith(RebrickableJSON.magic):
-                raise RuntimeError('Invalid Rebrickable JSON file, '
-                                 f'first line should be "{RebrickableJSON.magic}"')
+                raise RuntimeError("Invalid Rebrickable JSON file, " f'first line should be "{RebrickableJSON.magic}"')
 
-        with open(file_path, 'r', encoding='utf-8') as f:
+        with open(file_path, "r", encoding="utf-8") as f:
             # Read the JSON file
             data = json.load(f)
 
@@ -72,20 +73,20 @@ class RebrickableJSON(InputInterface):
         None
         """
         # Select only the "Part" and "Quantity" columns
-        self.df = self.df[['part.part_num', 'quantity']]
+        self.df = self.df[["part.part_num", "quantity"]]
         # Rename Part to DesignID
-        self.df = self.df.rename(columns={'part.part_num': 'DesignID'})
-        self.df = self.df.rename(columns={'quantity': 'Quantity'})
+        self.df = self.df.rename(columns={"part.part_num": "DesignID"})
+        self.df = self.df.rename(columns={"quantity": "Quantity"})
         # Only keep the first digits from the DesignID
-        self.df.loc[:, 'DesignID'] = self.df['DesignID'].str.extract(r'^(\d+)')[0]
+        self.df.loc[:, "DesignID"] = self.df["DesignID"].str.extract(r"^(\d+)")[0]
 
         # Group by "DesignID" and sum the "Quantity"
-        self.df = self.df.groupby('DesignID')['Quantity'].sum().reset_index()
+        self.df = self.df.groupby("DesignID")["Quantity"].sum().reset_index()
 
         # Sort the dataframe by "DesignID" in ascending numerical order
         self.df.DesignID = self.df.DesignID.astype(int)
         self.df.Quantity = self.df.Quantity.astype(int)
-        self.df = self.df.sort_values(by='DesignID', ascending=True)
+        self.df = self.df.sort_values(by="DesignID", ascending=True)
 
     def extension(self):
         """

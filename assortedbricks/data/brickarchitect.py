@@ -21,6 +21,7 @@
 # SPDX-License-Identifier: MIT
 
 from base64 import b64encode
+
 import requests
 from bs4 import BeautifulSoup
 
@@ -42,18 +43,18 @@ def get_labels(partid):
     """
 
     new_part = partid
-    labels = 'Lego'
+    labels = "Lego"
     try:
         url = f"https://brickarchitect.com/parts/{partid}"
         response = requests.get(url, timeout=10)
-        soup = BeautifulSoup(response.content, 'html.parser')
-        labels_div = soup.find('div', class_='chapternav')
-        labels_a = [a.text for a in labels_div.find_all('a')]
+        soup = BeautifulSoup(response.content, "html.parser")
+        labels_div = soup.find("div", class_="chapternav")
+        labels_a = [a.text for a in labels_div.find_all("a")]
         if len(labels_a) > 0:
-            if labels_a[0] == 'The LEGO Parts Guide':
-                labels_a[0] = 'Lego'
-            labels = ','.join(labels_a)
-            new_part = response.url.split('/')[-1]
+            if labels_a[0] == "The LEGO Parts Guide":
+                labels_a[0] = "Lego"
+            labels = ",".join(labels_a)
+            new_part = response.url.split("/")[-1]
     except requests.exceptions.HTTPError:
         print(f"Failed to fetch labels for part ID {partid}")
     except requests.exceptions.Timeout:
@@ -84,7 +85,7 @@ def get_image(partid):
         url = f"https://brickarchitect.com/content/parts/{partid}.png"
         response = requests.get(url, timeout=10)
         response.raise_for_status()
-        image = b64encode(response.content).decode('utf-8')
+        image = b64encode(response.content).decode("utf-8")
     except requests.exceptions.HTTPError:
         print(f"Failed to fetch part image for part ID {partid}")
     except requests.exceptions.Timeout:

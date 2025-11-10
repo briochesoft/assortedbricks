@@ -20,12 +20,12 @@
 #
 # SPDX-License-Identifier: MIT
 """
-    The main entry point of assortedbricks
+The main entry point of assortedbricks
 """
 
 from .assortedbricks import main
 
-__license__ = 'MIT'
-__copyright__ = 'Copyright (c) 2025, BriocheSoft'
+__license__ = "MIT"
+__copyright__ = "Copyright (c) 2025, BriocheSoft"
 
 main()

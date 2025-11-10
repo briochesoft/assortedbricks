@@ -20,12 +20,12 @@
 #
 # SPDX-License-Identifier: MIT
 
-from .rebrickableset import RebrickableSet
-from .rebrickablejson import RebrickableJSON
-from .rebrickablecsv import RebrickableCSV
 from .brickstorexml import BrickStoreXML
-from .ldcadpbg import LDCadPBG
 from .inputinterface import InputInterface
+from .ldcadpbg import LDCadPBG
+from .rebrickablecsv import RebrickableCSV
+from .rebrickablejson import RebrickableJSON
+from .rebrickableset import RebrickableSet
 
 
 class Input(InputInterface):
@@ -78,4 +78,4 @@ class Input(InputInterface):
 
     def extension(self):
         """Getter for the extension attribute."""
-        return ','.join(map(lambda x: x.extension(), self.supported_formats))
+        return ",".join(map(lambda x: x.extension(), self.supported_formats))

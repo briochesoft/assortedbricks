@@ -30,7 +30,7 @@ def get_rebrickable_key():
     :return: The key as a string if successful otherwise None
     """
     try:
-        with open("./config.yaml", 'r', encoding='utf-8') as f:
+        with open("./config.yaml", "r", encoding="utf-8") as f:
             config = yaml.safe_load(f)
         return config["rebrickable-key"]
     except (KeyError, FileNotFoundError):

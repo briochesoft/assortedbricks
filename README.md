@@ -23,7 +23,7 @@ source .env/bin/activate
 ./run-assortedbricks
 ```
 
-Then connect to ```http://localhost:5000``` 
+Then connect to ```http://localhost:5000```
 
 Give a set number or choose an inventory file, the number of clusters to generate and optionnaly a seed for the clustering algorithm.
 
@@ -34,9 +34,9 @@ rebrickable-key: "KEY"
 ```
 
 Supported file formats are:
- - Rebrickable CSV
- - Brickstore XML
- - LDCad PBG
+- Rebrickable CSV
+- Brickstore XML
+- LDCad PBG
 
 ## Acknowledgement
 

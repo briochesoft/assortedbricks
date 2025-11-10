@@ -21,7 +21,9 @@
 # SPDX-License-Identifier: MIT
 
 import re
+
 from pandas import DataFrame, concat
+
 from .inputinterface import InputInterface
 
 
@@ -47,21 +49,20 @@ class LDCadPBG(InputInterface):
         del input_data
 
         # Check if the file is a Rebrickable CSV file
-        with open(file_path, 'r', encoding='utf-8') as f:
+        with open(file_path, "r", encoding="utf-8") as f:
             first_line = f.read(len(LDCadPBG.magic))
             if not first_line.startswith(LDCadPBG.magic):
-                raise RuntimeError('Invalid LDCad file, '
-                                 f'first line should be "{LDCadPBG.magic}"')
+                raise RuntimeError("Invalid LDCad file, " f'first line should be "{LDCadPBG.magic}"')
 
         # Read the CSV file
-        with open(file_path, 'r', encoding='utf-8') as f:
+        with open(file_path, "r", encoding="utf-8") as f:
             # Inventory start after the line "<items>"
             line = f.readline()
             while not line.startswith("<items>"):
                 line = f.readline()
 
             # Extract part and quantity for each line
-            line_regex = re.compile(r'^([^\.]*)\.dat.*\[color=(\d+)\] \[count=(\d+)\]$')
+            line_regex = re.compile(r"^([^\.]*)\.dat.*\[color=(\d+)\] \[count=(\d+)\]$")
             for line in f.readlines():
                 match = line_regex.match(line)
                 if match:
@@ -69,12 +70,14 @@ class LDCadPBG(InputInterface):
                     color = match.group(2)
                     quantity = match.group(3)
                     if self.df is None:
-                        self.df = DataFrame(data={'DesignID': part, 'Color': color, 'Quantity': quantity},
-                                            index=[0])
+                        self.df = DataFrame(data={"DesignID": part, "Color": color, "Quantity": quantity}, index=[0])
                     else:
-                        self.df = concat([self.df,
-                                          DataFrame(data={'DesignID': part, 'Color': color, 'Quantity': quantity},
-                                                    index=[0])])
+                        self.df = concat(
+                            [
+                                self.df,
+                                DataFrame(data={"DesignID": part, "Color": color, "Quantity": quantity}, index=[0]),
+                            ]
+                        )
 
     def clean(self):
         """
@@ -89,18 +92,18 @@ class LDCadPBG(InputInterface):
         None
         """
         # Select only the "Part" and "Quantity" columns
-        self.df = self.df[['DesignID', 'Quantity']]
+        self.df = self.df[["DesignID", "Quantity"]]
         self.df.Quantity = self.df.Quantity.astype(int)
 
         # Only keep the first digits from the DesignID
-        self.df.loc[:, 'DesignID'] = self.df['DesignID'].str.extract(r'^(\d+)')[0]
+        self.df.loc[:, "DesignID"] = self.df["DesignID"].str.extract(r"^(\d+)")[0]
 
         # Group by "DesignID" and sum the "Quantity"
-        self.df = self.df.groupby('DesignID')['Quantity'].sum().reset_index()
+        self.df = self.df.groupby("DesignID")["Quantity"].sum().reset_index()
 
         # Sort the dataframe by "DesignID" in ascending numerical order
         self.df.DesignID = self.df.DesignID.astype(int)
-        self.df = self.df.sort_values(by='DesignID', ascending=True)
+        self.df = self.df.sort_values(by="DesignID", ascending=True)
 
     def extension(self):
         """
