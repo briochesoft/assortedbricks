@@ -21,6 +21,7 @@
 # SPDX-License-Identifier: MIT
 
 from pandas import read_xml
+
 from .inputinterface import InputInterface
 
 
@@ -46,14 +47,13 @@ class BrickStoreXML(InputInterface):
         del input_data
 
         # Check if the file is a BrickStore XML file
-        with open(file_path, 'r', encoding='utf-8') as f:
+        with open(file_path, "r", encoding="utf-8") as f:
             first_line = f.read(len(BrickStoreXML.magic))
             if not first_line.startswith(BrickStoreXML.magic):
-                raise RuntimeError('Invalid BrickStore XML file, '
-                                 f'first line should be "{BrickStoreXML.magic}"')
+                raise RuntimeError("Invalid BrickStore XML file, " f'first line should be "{BrickStoreXML.magic}"')
 
         # Read the CSV file
-        self.df = read_xml(file_path, xpath='//Inventory/Item')
+        self.df = read_xml(file_path, xpath="//Inventory/Item")
 
     def clean(self):
         """
@@ -68,19 +68,19 @@ class BrickStoreXML(InputInterface):
         None
         """
         # Select only the "ItemID" and "Qty" columns
-        self.df = self.df[['ItemID', 'Qty']]
+        self.df = self.df[["ItemID", "Qty"]]
         # Rename Part to DesignID and Qty to Quantity
-        self.df = self.df.rename(columns={'ItemID': 'DesignID', 'Qty': 'Quantity'})
+        self.df = self.df.rename(columns={"ItemID": "DesignID", "Qty": "Quantity"})
         # Only keep the first digits from the DesignID
-        self.df.loc[:, 'DesignID'] = self.df['DesignID'].str.extract(r'^(\d+)')[0]
+        self.df.loc[:, "DesignID"] = self.df["DesignID"].str.extract(r"^(\d+)")[0]
 
         # Group by "DesignID" and sum the "Quantity"
-        self.df = self.df.groupby('DesignID')['Quantity'].sum().reset_index()
+        self.df = self.df.groupby("DesignID")["Quantity"].sum().reset_index()
 
         # Sort the dataframe by "DesignID" in ascending numerical order
         self.df.DesignID = self.df.DesignID.astype(int)
         self.df.Quantity = self.df.Quantity.astype(int)
-        self.df = self.df.sort_values(by='DesignID', ascending=True)
+        self.df = self.df.sort_values(by="DesignID", ascending=True)
 
     def extension(self):
         """

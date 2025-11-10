@@ -47,7 +47,7 @@ def kmeans_clusters(input_df, num_clusters, seed=None):
     features_df = input_df.iloc[:, 2:]
 
     # Use the 'quantity' column as sample weights
-    sample_weights = input_df['Quantity']
+    sample_weights = input_df["Quantity"]
 
     # Perform K-Means clustering with sample weights
     kmeans = KMeans(n_clusters=num_clusters, random_state=seed)
@@ -55,39 +55,42 @@ def kmeans_clusters(input_df, num_clusters, seed=None):
 
     # K statistics
     inertia = kmeans.inertia_
-    silhouette = silhouette_score(features_df, kmeans.labels_, metric='euclidean')
-    print(f"WSS (lower is better) = {inertia}, "
-          f"sil (closer to 1 is better)= {silhouette}")
+    silhouette = silhouette_score(features_df, kmeans.labels_, metric="euclidean")
+    print(f"WSS (lower is better) = {inertia}, " f"sil (closer to 1 is better)= {silhouette}")
 
     # Assign clusters to each piece
-    input_df['cluster'] = kmeans.labels_
+    input_df["cluster"] = kmeans.labels_
 
     # Get quantity per cluster
     clusters = input_df
 
     # Remove DesignID column
-    clusters = clusters.drop('DesignID', axis=1)
+    clusters = clusters.drop("DesignID", axis=1)
 
     # Group by "cluster" and sum all the other columns
     columns = list(clusters.columns)
-    columns.remove('cluster')
-    clusters = clusters.groupby('cluster')[columns].sum().reset_index()
+    columns.remove("cluster")
+    clusters = clusters.groupby("cluster")[columns].sum().reset_index()
 
     # Create labels
-    clusters['label'] = clusters.apply(lambda x: ', '.join(
-        [col for col in clusters.columns[2:] if col != 'Lego' and x[col] == x['Lego']]), axis=1)
+    clusters["label"] = clusters.apply(
+        lambda x: ", ".join([col for col in clusters.columns[2:] if col != "Lego" and x[col] == x["Lego"]]), axis=1
+    )
 
     # Print statistics for the quantity of pieces in the clusters
-    print(clusters['Quantity'].describe())
+    print(clusters["Quantity"].describe())
 
     # Set default label to Other
-    clusters.loc[clusters['label'] == '', 'label'] = 'Other'
+    clusters.loc[clusters["label"] == "", "label"] = "Other"
 
     # Add a column containing all the DesignIDs in the cluster
-    clusters['DesignIDs'] = clusters.apply(lambda x: ', '.join(
-        [str(design_id) for design_id in
-            input_df[input_df['cluster'] == x['cluster']]['DesignID']]), axis=1)
+    clusters["DesignIDs"] = clusters.apply(
+        lambda x: ", ".join(
+            [str(design_id) for design_id in input_df[input_df["cluster"] == x["cluster"]]["DesignID"]]
+        ),
+        axis=1,
+    )
 
     clusters.Quantity = clusters.Quantity.astype(int)
-    clusters = clusters.sort_values(by='Quantity', ascending=True)
-    return clusters[['label', 'Quantity', 'DesignIDs']]
+    clusters = clusters.sort_values(by="Quantity", ascending=True)
+    return clusters[["label", "Quantity", "DesignIDs"]]

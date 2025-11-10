@@ -20,18 +20,20 @@
 #
 # SPDX-License-Identifier: MIT
 
-from datetime import datetime
-from concurrent.futures import ThreadPoolExecutor
 import re
-from pandas import merge, concat, DataFrame
+from concurrent.futures import ThreadPoolExecutor
+from datetime import datetime
+
 from numpy import where
-from .input.input import Input
+from pandas import DataFrame, concat, merge
+
 from .cluster import kmeans_clusters
+from .data.brickarchitect import fetch_part_info, get_image
 from .data.database import Database
-from .data.brickarchitect import get_image, fetch_part_info
+from .input.input import Input
 
 
-class Inventory():
+class Inventory:
     def __init__(self):
         """
         Initializes a new Inventory object.
@@ -124,17 +126,16 @@ class Inventory():
         assert self.clusters is not None, "Call cluster() first!"
         print(f"{str(datetime.now())}: Generating HTML...")
 
-        clusters = self.clusters.to_dict('records')
+        clusters = self.clusters.to_dict("records")
 
         # Open the output HTML file
-        no_category = re.compile(r'^\d+\. ')
-        html_string = ''
+        no_category = re.compile(r"^\d+\. ")
+        html_string = ""
 
         # Loop through each cluster
         with ThreadPoolExecutor() as executor:
-            for result in executor.map(lambda cluster:
-                                       self.__single_cluster_html(cluster, no_category), clusters):
-                html_string += ''.join(result)
+            for result in executor.map(lambda cluster: self.__single_cluster_html(cluster, no_category), clusters):
+                html_string += "".join(result)
         self.db.commit()
 
         print(f"{str(datetime.now())}: done")
@@ -157,30 +158,28 @@ class Inventory():
             A list of strings representing the HTML for a single cluster.
         """
         html = []
-        html.append('<div>\n')
-        label = cluster['label']
+        html.append("<div>\n")
+        label = cluster["label"]
         # Remove category index
-        label = regex.sub('', label)
+        label = regex.sub("", label)
 
-        quantity = int(cluster['Quantity'])
+        quantity = int(cluster["Quantity"])
 
         # Draw the cluster label and quantity
-        html.append('<p style="margin: 10px; font-size: 32px;">'
-                    f'{label} ({quantity})</p>\n')
+        html.append('<p style="margin: 10px; font-size: 32px;">' f"{label} ({quantity})</p>\n")
 
         rows = self.db.get_images_for_cluster(cluster)
 
         part_images_html = []
         for row in rows:
-            image, = row
+            (image,) = row
             if image is not None:
-                part_images_html.append(
-                    f'<img src="data:image/png;base64,{image}" style="margin: 10px;">\n')
+                part_images_html.append(f'<img src="data:image/png;base64,{image}" style="margin: 10px;">\n')
         html = html + part_images_html
 
-        html.append('</div>\n')
+        html.append("</div>\n")
         # Add a line break between clusters
-        html.append('<br>')
+        html.append("<br>")
         return html
 
     def merge_with_database(self, input_df):
@@ -198,11 +197,11 @@ class Inventory():
         -------
         None
         """
-        design_ids = ','.join(map(str, input_df['DesignID'].tolist()))
+        design_ids = ",".join(map(str, input_df["DesignID"].tolist()))
         database_df = self.db.get_labels_dataframe(design_ids)
 
         # Merge the input and database dataframes based on DesignID
-        self.df = merge(input_df, database_df, on='DesignID', how='left')
+        self.df = merge(input_df, database_df, on="DesignID", how="left")
 
     def fetch_missing_parts(self):
         # Get a list of DesignID without Labels
@@ -217,24 +216,28 @@ class Inventory():
         -------
         None
         """
-        unknown_parts = self.df[self.df['Labels'].isna()]['DesignID'].tolist()
+        unknown_parts = self.df[self.df["Labels"].isna()]["DesignID"].tolist()
         if len(unknown_parts) > 0:
             print(f"    Fetching {len(unknown_parts)} parts...")
             # Create a new dataframe for the unknown parts
-            new_parts_df = DataFrame(columns=['DesignID', 'Labels', 'Image'])
+            new_parts_df = DataFrame(columns=["DesignID", "Labels", "Image"])
             with ThreadPoolExecutor(max_workers=10) as executor:
-                today = datetime.now().strftime('%Y-%m-%d')
-                futures = [executor.submit(fetch_part_info, part)
-                           for part in unknown_parts]
+                today = datetime.now().strftime("%Y-%m-%d")
+                futures = [executor.submit(fetch_part_info, part) for part in unknown_parts]
                 for future in futures:
                     part, new_labels, new_image = future.result()
                     # add part to database
-                    new_parts_df = concat([new_parts_df,
-                                           DataFrame(data={'DesignID': part,
-                                                           'Labels': new_labels,
-                                                           'Image': new_image, 'Updated': today}, index=[0])])
+                    new_parts_df = concat(
+                        [
+                            new_parts_df,
+                            DataFrame(
+                                data={"DesignID": part, "Labels": new_labels, "Image": new_image, "Updated": today},
+                                index=[0],
+                            ),
+                        ]
+                    )
                     # add new_labels our dataframe
-                    self.df.loc[self.df['DesignID'] == part, 'Labels'] = new_labels
+                    self.df.loc[self.df["DesignID"] == part, "Labels"] = new_labels
 
             # Save to database
             self.db.append_parts_dataframe(new_parts_df)
@@ -257,11 +260,11 @@ class Inventory():
         is older than today, it will not try to update the image. This is to prevent
         the function from fetching the same image multiple times in a row.
         """
-        design_ids = ','.join(map(str, self.df['DesignID'].tolist()))
+        design_ids = ",".join(map(str, self.df["DesignID"].tolist()))
         rows = self.db.get_missing_images(design_ids)
         for row in rows:
             (part, updated) = row
-            fetch_date = datetime.strptime(updated, '%Y-%m-%d').date()
+            fetch_date = datetime.strptime(updated, "%Y-%m-%d").date()
             # We only try to update the image once a day
             if fetch_date < datetime.now().date():
                 print(f"Updating image for part {part}")
@@ -281,7 +284,7 @@ class Inventory():
         The resulting dataframe will be stored in the `self.df` attribute.
         """
 
-        labels_array = self.df['Labels'].str.split(',')
+        labels_array = self.df["Labels"].str.split(",")
 
         labels_len = 0
         all_labels = []
@@ -295,17 +298,15 @@ class Inventory():
         all_labels = list(dict.fromkeys(all_labels))
 
         # Create columns for each label keeping the order
-        label_df = concat([self.df,
-                           DataFrame({label: [0] * len(self.df) for label in all_labels if label})],
-                          axis=1)
+        label_df = concat([self.df, DataFrame({label: [0] * len(self.df) for label in all_labels if label})], axis=1)
 
         # Set the value of each label column to 1 if the label is present in the database
         for label in all_labels:
             if label:
-                label_df.loc[:, label] = where(label_df.loc[:, 'Labels'].str.contains(label, regex=False), 1, 0)
+                label_df.loc[:, label] = where(label_df.loc[:, "Labels"].str.contains(label, regex=False), 1, 0)
 
         # Drop the unnecessary Labels column from the output dataframe
-        self.df = label_df.drop('Labels', axis=1)
+        self.df = label_df.drop("Labels", axis=1)
 
     def get_extensions(self):
         """
